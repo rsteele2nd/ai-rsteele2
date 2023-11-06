@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Workflow Simulator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="inputs">
+    <!-- Form for adding activities -->
+    <h2>Add Activity</h2>
+    <form id="activity-form">
+        <input type="text" id="activity-name" placeholder="Activity Name" required />
+        <select id="activity-workflow" multiple>
+            <!-- Equipment options will be added here dynamically -->
+        </select>
+        <button type="submit">Add Activity</button>
+    </form>
+
+    <!-- Form for adding equipment -->
+    <h2>Add Equipment</h2>
+    <form id="equipment-form">
+        <input type="text" id="equipment-name" placeholder="Equipment Name" required />
+        <input type="text" id="equipment-category" placeholder="Category" required />
+        <input type="text" id="equipment-task" placeholder="Task Performed" required />
+        <input type="number" id="equipment-duration" placeholder="Duration (mins)" required />
+        <button type="submit">Add Equipment</button>
+    </form>
+
+    <!-- Form for adding constraints -->
+    <h2>Add Constraints</h2>
+    <form id="constraint-form">
+        <input type="text" id="constraint-text" placeholder="Constraint Description" required />
+        <button type="submit">Add Constraint</button>
+    </form>
+
+    <!-- Configuration for schedule dates -->
+    <h2>Configuration</h2>
+    <form id="config-form">
+        <label for="schedule-start-datetime">Schedule Start:</label>
+        <input type="date" id="schedule-start-date" placeholder="Start Date" required />
+        <input type="time" id="schedule-start-time" placeholder="Start Time" required />
+
+        <label for="schedule-end-datetime">Schedule End:</label>
+        <input type="date" id="schedule-end-date" placeholder="End Date" required />
+        <input type="time" id="schedule-end-time" placeholder="End Time" required />
+
+        <button type="submit">Save Configuration</button>
+    </form>
+</div>
+
+<div id="data-tables">
+    <!-- Activities Table -->
+    <h2>Activities</h2>
+    <table id="activities-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Workflow</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Activity rows will be added here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Equipment Table -->
+    <h2>Equipment</h2>
+    <table id="equipment-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Task</th>
+                <th>Duration (mins)</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Equipment rows will be added here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Constraints Table -->
+    <h2>Constraints</h2>
+    <table id="constraints-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Constraint rows will be added here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<button id="submit-data">Submit Data</button>
+<pre id="json-output"></pre>
+
+<script>
+    $(document).ready(function() {
+        function addItem(category, item) {
+            $.ajax({
+                url: '/add/' + category,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(item),
+                dataType: 'json',
+                success: function(response) {
+                    updateTables(response.data);
+                }
+            });
+        }
+    
+        function deleteItem(category, idOrName) {
+            $.ajax({
+                url: '/delete/' + category,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: idOrName }),
+                dataType: 'json',
+                success: function(response) {
+                    updateTables(response.data);
+                }
+            });
+        }
+    
+        function updateTables(data) {
+            // Update Equipment Select Options
+            var workflowSelect = $('#activity-workflow');
+            workflowSelect.empty(); // Clear the select first
+            $.each(data.equipment, function(index, equipment) {
+                workflowSelect.append($('<option>', {
+                    value: equipment.name,
+                    text : equipment.name
+                }));
+            });
+
+            // Update Activities Table
+            var activitiesTable = $('#activities-table tbody');
+            activitiesTable.empty(); // Clear the table first
+            $.each(data.activities, function(index, activity) {
+                var workflowText = activity.workflow.join(", "); // Assuming workflow is an array of equipment names
+                                // ...continuing from the previous code for updateTables function
+                                activitiesTable.append('<tr>' +
+                    '<td>' + activity.id + '</td>' +
+                    '<td>' + activity.name + '</td>' +
+                    '<td>' + workflowText + '</td>' +
+                    '<td><button onclick="deleteItem(\'activities\', \'' + activity.id + '\')">Delete</button></td>' +
+                '</tr>');
+            });
+
+            // Update Equipment Table
+            var equipmentTable = $('#equipment-table tbody');
+            equipmentTable.empty(); // Clear the table first
+            $.each(data.equipment, function(index, item) {
+                equipmentTable.append('<tr>' +
+                    '<td>' + item.name + '</td>' +
+                    '<td>' + item.category + '</td>' +
+                    '<td>' + item.task + '</td>' +
+                    '<td>' + item.duration + '</td>' +
+                    '<td><button onclick="deleteItem(\'equipment\', \'' + item.name + '\')">Delete</button></td>' +
+                '</tr>');
+            });
+
+            // Update Constraints Table
+            var constraintsTable = $('#constraints-table tbody');
+            constraintsTable.empty(); // Clear the table first
+            $.each(data.constraints, function(index, constraint) {
+                constraintsTable.append('<tr>' +
+                    '<td>' + constraint.description + '</td>' +
+                    '<td><button onclick="deleteItem(\'constraints\', \'' + constraint.description + '\')">Delete</button></td>' +
+                '</tr>');
+            });
+        }
+    
+        // Handlers for adding items
+        $('#activity-form').on('submit', function(e) {
+            e.preventDefault();
+            var selectedEquipment = $('#activity-workflow').val() || [];
+            var activity = {
+                id: Date.now(), // Using a timestamp as a simple unique ID
+                name: $('#activity-name').val().trim(),
+                workflow: selectedEquipment
+            };
+            addItem('activities', activity);
+            $('#activity-name').val('');
+            // No need to clear the select, it's multi-select and user can change selection
+        });
+    
+        $('#equipment-form').on('submit', function(e) {
+            e.preventDefault();
+            var equipment = {
+                name: $('#equipment-name').val().trim(),
+                category: $('#equipment-category').val().trim(),
+                task: $('#equipment-task').val().trim(),
+                duration: $('#equipment-duration').val().trim()
+            };
+            addItem('equipment', equipment);
+            $('#equipment-name').val('');
+            $('#equipment-category').val('');
+            $('#equipment-task').val('');
+            $('#equipment-duration').val('');
+        });
+    
+        $('#constraint-form').on('submit', function(e) {
+            e.preventDefault();
+            var constraint = {
+                description: $('#constraint-text').val().trim()
+            };
+            addItem('constraints', constraint);
+            $('#constraint-text').val('');
+        });
+
+        $('#config-form').on('submit', function(e) {
+            e.preventDefault();
+
+            // Inform the user that the configuration has been saved
+            alert('Configuration saved!');
+        });
+
+    
+        $('#submit-data').on('click', function() {
+            // Make an AJAX GET request to fetch the data first
+            $.ajax({
+                url: '/get-data',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // 'response' now holds the data fetched from the server
+                    const scheduleData = {
+                        startDate: $('#schedule-start-date').val().trim() + ' ' + $('#schedule-start-time').val().trim(),
+                        endDate: $('#schedule-end-date').val().trim() + ' ' + $('#schedule-end-time').val().trim(),
+                        activities: response.activities,  // Use the fetched data
+                        equipment: response.equipment,    // Use the fetched data
+                        constraints: response.constraints // Use the fetched data
+                    };
+
+                    // Now send the scheduleData to the server
+                    $.ajax({
+                        url: '/submit',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(scheduleData),
+                        dataType: 'json',
+                        success: function(submitResponse) {
+                            if (submitResponse.success) {
+                                $('#json-output').text(JSON.stringify(scheduleData, null, 2));
+                                alert('Data submitted successfully.');
+                            } else {
+                                alert('Error: Submission failed.');
+                            }
+                        },
+                        error: function(xhr, status, submitError) {
+                            alert('An error occurred: ' + submitError);
+                        }
+                    });
+                },
+                error: function(xhr, status, fetchError) {
+                    alert('An error occurred fetching data: ' + fetchError);
+                }
+            });
+        });
+
+        // Expose deleteItem to global scope to be callable from onclick
+        window.deleteItem = deleteItem;
+    });
+</script>
+    
+
+</body>
+</html>
