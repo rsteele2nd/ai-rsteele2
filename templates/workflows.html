@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script>
+    fetchEquipment();
+</script>
+
+<div class="container mt-4">
+    <!-- Workflow Form -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Define Workflow</h2>
+                </div>
+                <div class="card-body">
+                    <form id="workflow-form">
+                        <div class="mb-3">
+                            <input type="text" id="workflow-name" class="form-control" placeholder="Workflow Name" required />
+                        </div>
+                        <div class="mb-3">
+                            <select multiple id="equipment-select" class="form-select">
+                                <!-- Equipment options will be populated here -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Workflow</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workflows Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Defined Workflows</h2>
+                </div>
+                <div class="card-body">
+                    <table id="workflows-table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Equipment</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Workflow rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

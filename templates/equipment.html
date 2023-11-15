@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div id="inputs">
+    <main class="col-md-9 col-lg-10">
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <!-- Equipment Form Column -->
+                <div class="col-lg-5 mb-5 me-lg-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Add Equipment</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="equipment-form">
+                                <div class="mb-3">
+                                    <input type="text" id="equipment-name" class="form-control" placeholder="Equipment Name" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" id="equipment-category" class="form-control" placeholder="Category" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" id="equipment-task" class="form-control" placeholder="Task Performed" required />
+                                </div>
+                                <div class="mb-3">
+                                    <input type="number" id="equipment-duration" class="form-control" placeholder="Duration (mins)" required />
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Equipment</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment Table Column -->
+                <div class="col-lg-6 mb-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Equipment</h2>
+                        </div>
+                        <div class="card-body">
+                            <table id="equipment-table" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Task</th>
+                                        <th>Duration (mins)</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Equipment rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

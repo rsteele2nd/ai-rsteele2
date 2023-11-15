@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="inputs">
+    <main class="col-md-9 col-lg-10">
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <!-- Activity Form Column -->
+                <div class="col-lg-5 mb-5 me-lg-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Add Activities</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="activity-form">
+                                <input type="text" id="activity-name" class="form-control" placeholder="Activity Name" required />
+                                <select id="activity-workflow" class="form-select mt-3" multiple>
+                                    <!-- Workflow options will be added here dynamically -->
+                                </select>
+                                <button type="submit" class="btn btn-primary mt-3">Add Activity</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activities Table Column -->
+                <div class="col-lg-6 mb-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Activities</h2>
+                        </div>
+                        <div class="card-body">
+                            <table id="activities-table" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Workflow</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Activity rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

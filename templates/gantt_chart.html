@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt Chart</title>
+    <!-- Plotly JavaScript library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #chart {
+            width: 80%;
+            height: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        try {
+            var graphJSON = {{ graphJSON|safe }};
+            console.log('Received graphJSON:', graphJSON);
+    
+            if (typeof graphJSON === 'string') {
+                console.log('Parsing graphJSON as JSON');
+                graphJSON = JSON.parse(graphJSON);
+            }
+    
+            console.log('Rendering chart with:', graphJSON);
+            Plotly.newPlot('chart', graphJSON.data, graphJSON.layout);
+        } catch (error) {
+            console.error("Error rendering Plotly chart:", error);
+            document.getElementById('chart').innerHTML = '<p>An error occurred while rendering the chart: ' + error.message + '</p>';
+        }
+    </script>    
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="inputs">
+    <main class="col-md-9 col-lg-10">
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <!-- Equipment Form Column -->
+                <div class="col-lg-5 mb-5 me-lg-3">
+                    <div class="card">
+                        <h2>Add Constraints</h2>
+                        <form id="constraint-form">
+                            <input type="text" id="constraint-text" placeholder="Constraint Description" required />
+                            <button type="submit">Add Constraint</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Equipment Table Column -->
+                <div class="col-lg-6 mb-5">
+                    <div class="card">
+                        <h2>Constraints</h2>
+                        <table id="constraints-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Constraint rows will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Configuration</h2>
+        <form id="config-form">
+            <label for="schedule-start-datetime">Schedule Start:</label>
+            <input type="date" id="schedule-start-date" placeholder="Start Date" required />
+            <input type="time" id="schedule-start-time" placeholder="Start Time" required />
+
+            <label for="schedule-end-datetime">Schedule End:</label>
+            <input type="date" id="schedule-end-date" placeholder="End Date" required />
+            <input type="time" id="schedule-end-time" placeholder="End Time" required />
+
+            <button type="submit">Save Configuration</button>
+        </form>
+
+        <button id="submit-data">Submit Data</button>
+    </main>
+</div>
+{% endblock %}
