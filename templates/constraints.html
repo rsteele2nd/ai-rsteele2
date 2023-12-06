@@ -4,52 +4,80 @@
 <div id="inputs">
     <main class="col-md-9 col-lg-10">
         <div class="container mt-4">
+            <!-- Constraints Section -->
             <div class="row justify-content-center">
-                <!-- Equipment Form Column -->
                 <div class="col-lg-5 mb-5 me-lg-3">
                     <div class="card">
-                        <h2>Add Constraints</h2>
-                        <form id="constraint-form">
-                            <input type="text" id="constraint-text" placeholder="Constraint Description" required />
-                            <button type="submit">Add Constraint</button>
-                        </form>
+                        <div class="card-header">
+                            <h2>Add Constraints</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="constraint-form">
+                                <input type="text" id="constraint-text" class="form-control" placeholder="Constraint Description" required />
+                                <button type="submit" class="btn btn-primary mt-3">Add Constraint</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Equipment Table Column -->
                 <div class="col-lg-6 mb-5">
                     <div class="card">
-                        <h2>Constraints</h2>
-                        <table id="constraints-table">
-                            <thead>
-                                <tr>
-                                    <th>Description</th>
-                                    <th>Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Constraint rows will be added here dynamically -->
-                            </tbody>
-                        </table>
+                        <div class="card-header">
+                            <h2>Constraints</h2>
+                        </div>
+                        <div class="card-body">
+                            <table id="constraints-table" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Constraint rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Time Section -->
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mb-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Start Time Configuration</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="config-form">
+                                <label for="schedule-start-datetime">Schedule Start:</label>
+                                <input type="date" id="schedule-start-date" class="form-control" placeholder="Start Date" value="{{ start_date }}" required />
+                                <input type="time" id="schedule-start-time" class="form-control mt-3" placeholder="Start Time" value="{{ start_time }}" required />
+                                <button type="submit" class="btn btn-primary mt-3">Save Start Time</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompt Variable Section -->
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mb-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Prompt Configuration</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="prompt-form">
+                                <textarea id="prompt-text" class="form-control" rows="4" required>{{ message }}</textarea>
+                                <button type="submit" class="btn btn-primary mt-3">Update Fields</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <h2>Configuration</h2>
-        <form id="config-form">
-            <label for="schedule-start-datetime">Schedule Start:</label>
-            <input type="date" id="schedule-start-date" placeholder="Start Date" required />
-            <input type="time" id="schedule-start-time" placeholder="Start Time" required />
-
-            <label for="schedule-end-datetime">Schedule End:</label>
-            <input type="date" id="schedule-end-date" placeholder="End Date" required />
-            <input type="time" id="schedule-end-time" placeholder="End Time" required />
-
-            <button type="submit">Save Configuration</button>
-        </form>
-
-        <button id="submit-data">Submit Data</button>
     </main>
 </div>
 {% endblock %}

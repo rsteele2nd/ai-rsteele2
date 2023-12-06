@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center">
+        <h1>Welcome to GPT Scheduler</h1>
+        <p class="lead">Click the buttons below to start a demo of the project with preloaded data</p>
+        <p class="lead">
+            Note that for the manufacturing demo download the csv file 
+            <a href="{{ url_for('static', filename='csv/manufacturing_activities.csv') }}" download>here</a> 
+            and load it into the activities page.
+        </p>        
+        <button onclick="startDemo()" class="btn btn-primary btn-lg">Start Demo</button>
+        <button onclick="startManufacturingDemo()" class="btn btn-primary btn-lg">Start Manufacturing Plant Demo</button>
+    </div>
+
+    <!-- About the Project -->
+    <div class="mt-5">
+        <h2>About the Project</h2>
+        <p>
+            This project was built as a demo of ChatGPT and its abilities to schedule different activities in a 
+            manufacturing plant. This idea came from work that Rena Steele did during the summer of 2023. 
+        </p>
+    </div>
+
+    <!-- Project Features -->
+    <div class="mt-5">
+        <h2>What It Does</h2>
+        <p>
+            Click on a demo button above to start a demo and try it out. Each of the buttons in the sidebar 
+            are steps to get a complete manufacturing schedule. 
+        </p>
+    </div>
+</div>
+
+<script>
+    function startDemo() {
+        $.ajax({
+            url: '/set-demo-data',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({}),  // No need to send data in this case
+            dataType: 'json',
+            success: function(response) {
+                alert('Demo data set successfully');
+                // Optionally, redirect or perform other actions upon success
+            },
+            error: function(xhr, status, error) {
+                console.error("Error setting demo data: " + error);
+            }
+        });
+    }
+
+    function startManufacturingDemo() {
+        $.ajax({
+            url: '/set-manufacturing-demo-data',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({}),  // No need to send data in this case
+            dataType: 'json',
+            success: function(response) {
+                alert('Demo data set successfully');
+                // Optionally, redirect or perform other actions upon success
+            },
+            error: function(xhr, status, error) {
+                console.error("Error setting demo data: " + error);
+            }
+        });
+    }
+</script>
+{% endblock %}

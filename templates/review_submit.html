@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center">
+        <h2>Review and Submit</h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Start Time Configuration</h2>
+                </div>
+                <div class="card-body">
+                    <form id="config-form">
+                        <label for="schedule-start-datetime">Schedule Start:</label>
+                        <input type="date" id="schedule-start-date" class="form-control" placeholder="Start Date" value="{{ start_date }}" required readonly />
+                        <input type="time" id="schedule-start-time" class="form-control mt-3" placeholder="Start Time" value="{{ start_time }}" required readonly />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display Activities -->
+    <div class="row justify-content-center">
+        <div class="col-lg-6 mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Activities</h2>
+                </div>
+                <div class="card-body">
+                    <table id="activities-table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Workflow</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Activity rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display Constraints -->
+    <div class="row justify-content-center">
+        <div class="col-lg-6 mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Constraints</h2>
+                </div>
+                <div class="card-body">
+                    <table id="constraints-table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Constraint rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display Prompt -->
+    <div class="row justify-content-center">
+        <div class="col-lg-6 mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Prompt Configuration</h2>
+                </div>
+                <div class="card-body">
+                    <form id="prompt-form">
+                        <textarea id="prompt-text" class="form-control" rows="4" required>{{ message }}</textarea>
+                        <button type="submit" class="btn btn-primary mt-3">Update Prompt</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <button id="submit-data-button" class="btn btn-primary">Submit Data</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

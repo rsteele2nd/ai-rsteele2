@@ -8,23 +8,39 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 updateTables(response.data);
-                fetchWorkflows();
+                if (category === 'workflows') {
+                    fetchEquipment(); // Refetch equipment to reset the sortable list
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error adding " + category + ": " + error);
             }
         });
     }
 
-    function deleteItem(category, idOrName) {
+    function deleteItem(category, name) {
         $.ajax({
             url: '/delete/' + category,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id: idOrName }),
+            data: JSON.stringify({ name: name }),
             dataType: 'json',
             success: function(response) {
-                updateTables(response.data);
+                // Remove the corresponding row based on the category
+                if (category === 'equipment') {
+                    $('#equipment-row-' + name).remove();
+                } else if (category === 'activities') {
+                    $('#activity-row-' + name).remove();
+                } else if (category === 'workflows') {
+                    $('#workflow-row-' + name).remove();
+                } else if (category === 'constraints') {
+                    $('#constraint-row-' + name).remove();
+                }
+    
+                updateTables(response.data); // Update other tables if needed
             }
         });
-    }
+    }    
 
     function fetchDataAndUpdateTables() {
         $.ajax({
@@ -60,7 +76,7 @@ $(document).ready(function() {
         var activitiesTable = $('#activities-table tbody');
         activitiesTable.empty();
         $.each(data.activities, function(index, activity) {
-            activitiesTable.append('<tr>' +
+            activitiesTable.append('<tr id="activity-row-' + activity.id + '">' +
                 '<td>' + activity.id + '</td>' +
                 '<td>' + activity.name + '</td>' +
                 '<td>' + activity.workflow.join(", ") + '</td>' +
@@ -72,7 +88,7 @@ $(document).ready(function() {
         var equipmentTable = $('#equipment-table tbody');
         equipmentTable.empty(); // Clear the table first
         $.each(data.equipment, function(index, item) {
-            equipmentTable.append('<tr>' +
+            equipmentTable.append('<tr id="equipment-row-' + item.name + '">' +
                 '<td>' + item.name + '</td>' +
                 '<td>' + item.category + '</td>' +
                 '<td>' + item.task + '</td>' +
@@ -85,7 +101,7 @@ $(document).ready(function() {
         var constraintsTable = $('#constraints-table tbody');
         constraintsTable.empty(); // Clear the table first
         $.each(data.constraints, function(index, constraint) {
-            constraintsTable.append('<tr>' +
+            constraintsTable.append('<tr id="constraint-row-' + constraint.description + '">' +
                 '<td>' + constraint.description + '</td>' +
                 '<td><button onclick="deleteItem(\'constraints\', \'' + constraint.description + '\')">Delete</button></td>' +
             '</tr>');
@@ -95,7 +111,7 @@ $(document).ready(function() {
         var workflowsTable = $('#workflows-table tbody');
         workflowsTable.empty();
         $.each(data.workflows, function(index, workflow) {
-            workflowsTable.append('<tr>' +
+            workflowsTable.append('<tr id="workflow-row-' + workflow.name + '">' +
                 '<td>' + workflow.name + '</td>' +
                 '<td>' + workflow.equipment.join(", ") + '</td>' +
                 '<td><button onclick="deleteItem(\'workflows\', \'' + workflow.name + '\')">Delete</button></td>' +
@@ -106,24 +122,29 @@ $(document).ready(function() {
     // Fetch Equipment and Update Multi-select
     function fetchEquipment() {
         $.ajax({
-            url: '/get-data',
+            url: '/get-equipment',
             type: 'GET',
             dataType: 'json',
             success: function(response) {
-                var equipmentSelect = $('#equipment-select');
-                equipmentSelect.empty();
-                $.each(response.equipment, function(index, equipment) {
-                    equipmentSelect.append($('<option>', {
-                        value: equipment.name,
-                        text: equipment.name
-                    }));
+                var equipmentList = $('#sortable-equipment');
+                equipmentList.empty(); // Clear existing items
+    
+                $.each(response, function(index, equipment) {
+                    var listItem = $('<li class="list-group-item d-flex align-items-center" data-equipment-name="' + equipment.name + '"></li>');
+                    listItem.append('<input type="checkbox" class="me-2" checked>');
+                    listItem.append(equipment.name);
+                    equipmentList.append(listItem);
                 });
+    
+                // Make the list sortable
+                equipmentList.sortable();
+                equipmentList.disableSelection();
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching equipment: " + error);
             }
         });
-    }
+    }    
 
     function fetchWorkflows() {
         $.ajax({
@@ -149,6 +170,23 @@ $(document).ready(function() {
     function redirectToGanttChart() {
         window.location.href = '/gantt-chart'; // URL of your Gantt chart page
     }
+
+    function createWorkflow(name, equipment) {
+        $.ajax({
+            url: '/create-workflow',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: name, equipment: equipment }),
+            dataType: 'json',
+            success: function(response) {
+                alert('Workflow created successfully');
+                // Optionally, update the UI with the new workflow
+            },
+            error: function(xhr, status, error) {
+                console.error("Error creating workflow: " + error);
+            }
+        });
+    }    
 
     // Handler for adding an activity
     $('#activity-form').on('submit', function(e) {
@@ -190,67 +228,109 @@ $(document).ready(function() {
 
     $('#config-form').on('submit', function(e) {
         e.preventDefault();
-
-        // Inform the user that the configuration has been saved
-        alert('Configuration saved!');
+        var startDate = $('#schedule-start-date').val().trim();
+        var startTime = $('#schedule-start-time').val().trim();
+    
+        // Send the updated start time to the server
+        $.ajax({
+            url: '/update-start-time',  // You need to create this route in Flask
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ startDate: startDate, startTime: startTime }),
+            dataType: 'json',
+            success: function(response) {
+                alert('Start time updated successfully!');
+            },
+            error: function(xhr, status, error) {
+                console.error("Error updating start time: " + error);
+            }
+        });
     });
 
     // Handler for adding a workflow
     $('#workflow-form').on('submit', function(e) {
         e.preventDefault();
-        var selectedEquipment = $('#equipment-select').val() || [];
+    
+        var workflowName = $('#workflow-name').val().trim();
+        var selectedEquipment = [];
+    
+        $('#sortable-equipment').children().each(function() {
+            var isChecked = $(this).find('input[type="checkbox"]').is(':checked');
+            if (isChecked) {
+                var equipmentName = $(this).data('equipment-name');
+                selectedEquipment.push(equipmentName);
+            }
+        });
+    
         var workflow = {
-            name: $('#workflow-name').val().trim(),
+            name: workflowName,
             equipment: selectedEquipment
         };
+    
         addItem('workflows', workflow);
         $('#workflow-name').val('');
-        $('#equipment-select').val([]); // Clear selected options
+        $('#sortable-equipment').empty();
     });
-
-
-    $('#submit-data').on('click', function() {
-        // Make an AJAX GET request to fetch the data first
+    
+    $('#submit-data-button').on('click', function() {
+        // Make the AJAX POST request to the /submit route
         $.ajax({
-            url: '/get-data',
-            type: 'GET',
+            url: '/submit',
+            type: 'POST',
+            contentType: 'application/json',
+            data: null,
             dataType: 'json',
             success: function(response) {
-                // 'response' now holds the data fetched from the server
-                const scheduleData = {
-                    startDate: $('#schedule-start-date').val().trim() + ' ' + $('#schedule-start-time').val().trim(),
-                    endDate: $('#schedule-end-date').val().trim() + ' ' + $('#schedule-end-time').val().trim(),
-                    activities: response.activities,  // Use the fetched data
-                    equipment: response.equipment,    // Use the fetched data
-                    constraints: response.constraints, // Use the fetched data
-                    workflow: response.workflow
-                };
-
-                // Now send the scheduleData to the server
-                $.ajax({
-                    url: '/submit',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(scheduleData),
-                    dataType: 'json',
-                    success: function(submitResponse) {
-                        if (submitResponse.success) {
-                            $('#json-output').text(JSON.stringify(scheduleData, null, 2));
-                            redirectToGanttChart(); // Call the function to redirect
-                        } else {
-                            alert('Error: Submission failed.');
-                        }
-                    },
-                    error: function(xhr, status, submitError) {
-                        alert('An error occurred: ' + submitError);
-                    }
-                });
+                alert('Data submitted successfully!');
+                // Handle the response here
             },
-            error: function(xhr, status, fetchError) {
-                alert('An error occurred fetching data: ' + fetchError);
+            error: function(xhr, status, error) {
+                alert('Error submitting data: ' + error);
             }
         });
     });
+
+    $('#prompt-form').on('submit', function(e) {
+        e.preventDefault();
+        var updatedMessage = $('#prompt-text').val().trim();
+    
+        // Send the updated message to the server
+        $.ajax({
+            url: '/update-message',  // You'll need to create this route in Flask
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ message: updatedMessage }),
+            dataType: 'json',
+            success: function(response) {
+                // Handle response
+            },
+            error: function(xhr, status, error) {
+                console.error("Error updating message: " + error);
+            }
+        });
+    });
+
+    $('#csv-upload-form').on('submit', function(e) {
+        e.preventDefault();
+        var fileInput = $('#csv-file')[0];
+        var formData = new FormData();
+        formData.append('csvfile', fileInput.files[0]);
+    
+        $.ajax({
+            url: '/upload-csv',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Update activities table with new data
+                updateTables(response.data);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error uploading CSV: " + error);
+            }
+        });
+    });    
 
     // Expose deleteItem to global scope to be callable from onclick
     window.deleteItem = deleteItem;
